@@ -24,6 +24,8 @@ pipeline {
                     -e MYSQL_DATABASE=TodoDb \
                     mariadb:latest
                 '''
+                // Geef MariaDB 10 seconden de tijd om te initialiseren en op te starten
+                sh 'sleep 10'
             }
         }
         stage('Build Docker Image') {
@@ -33,7 +35,6 @@ pipeline {
         }
         stage('Run App Container') {
             steps {
-                // We voegen hier ASPNETCORE_ENVIRONMENT=Development toe
                 sh '''
                     docker run -d --name dotnetrunning \
                     --network net-demo \
