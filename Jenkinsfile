@@ -48,7 +48,7 @@ pipeline {
                     --network net-demo \
                     -p 8081:8080 \
                     -e ASPNETCORE_ENVIRONMENT=Development \
-                    -e ConnectionStrings__DefaultConnection="Server=dbrunning;Database=TodoDb;User=root;Password=secret;" \
+                    -e ConnectionStrings__DefaultConnection="Server=dbrunning;Port=3306;Database=TodoDb;Uid=root;Pwd=secret;" \
                     dotnet-demo-app
                 '''
             }
