@@ -21,6 +21,7 @@ pipeline {
                     docker run -d --name dbrunning \
                     --network net-demo \
                     -e MYSQL_ROOT_PASSWORD=secret \
+                    -e MYSQL_ROOT_HOST='%' \
                     -e MYSQL_DATABASE=TodoDb \
                     mariadb:latest
                 '''
