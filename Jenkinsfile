@@ -9,17 +9,10 @@ pipeline {
                 }
             }
         }
-        stage('Build Docker Image') {
+        stage('Build with Dockerfile in TodoApp') {
             steps {
-                // Bouw de Docker image van de .NET app
-                // (In de TodoApp map zit de Dockerfile of we gebruiken de root)
-                sh 'docker build -t dotnet-demo-app .'
-            }
-        }
-        stage('Run Container') {
-            steps {
-                // Start de container op poort 8080
-                sh 'docker run -d --name dotnetrunning -p 8080:8080 dotnet-demo-app'
+                // Als de Dockerfile in de TodoApp map staat, bouwen we vanaf daar
+                sh 'docker build -t dotnet-demo-app ./TodoApp'
             }
         }
     }
