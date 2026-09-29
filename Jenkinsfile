@@ -4,15 +4,14 @@ pipeline {
         stage('Cleanup') {
             steps {
                 catchError(buildResult: 'SUCCESS') {
-                    sh 'docker-compose down'
+                    sh 'podman compose down'
                 }
             }
         }
-        stage('Build and Test via Docker') {
+        stage('Deploy with Podman Compose') {
             steps {
-                // In plaats van 'dotnet test' lokaal te draaien, 
-                // laten we Docker Compose de hele app en tests bouwen en opstarten
-                sh 'docker-compose up -d --build'
+                // Bouwt en start de .NET app en MariaDB via podman compose
+                sh 'podman compose up -d --build'
             }
         }
     }
