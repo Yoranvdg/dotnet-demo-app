@@ -24,8 +24,19 @@ pipeline {
                     -e MYSQL_DATABASE=TodoDb \
                     mariadb:latest
                 '''
-                // Geef MariaDB 10 seconden de tijd om te initialiseren en op te starten
-                sh 'sleep 10'
+            }
+        }
+        stage('Wait for Database') {
+            steps {
+                // Wacht actief tot MariaDB volledig klaar is om connecties te accepteren
+                sh '''
+                    echo "Waiting for MariaDB to start up..."
+                    until docker exec dbrunning mysqladmin ping -h"localhost" -uroot -psecret --silent; do
+                        echo "Database is still booting, waiting 3 seconds..."
+                        sleep 3
+                    done
+                    echo "Database is online and ready!"
+                '''
             }
         }
         stage('Build Docker Image') {
