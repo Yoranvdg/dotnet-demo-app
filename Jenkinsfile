@@ -20,19 +20,28 @@ pipeline {
                 sh '''
                     docker run -d --name dbrunning \
                     --network net-demo \
-                    -e MYSQL_ROOT_PASSWORD=secret \
-                    -e MYSQL_ROOT_HOST='%' \
-                    -e MYSQL_DATABASE=TodoDb \
-                    mariadb:latest
+                    -e MARIADB_ROOT_PASSWORD=sekrit \
+                    -e MARIADB_DATABASE=todo_db \
+                    -e MARIADB_USER=todo_usr \
+                    -e MARIADB_PASSWORD=letmeinplz \
+                    mariadb:11
                 '''
             }
         }
-        stage('Wait for Database') {
+        stage('Wait for Database & Init Schema') {
             steps {
                 sh '''
-                    echo "Waiting for MariaDB to fully initialize..."
-                    sleep 15
-                    echo "Database startup buffer complete!"
+                    echo "Waiting 20 seconds for MariaDB to initialize..."
+                    sleep 20
+                    echo "Creating todos table..."
+                    docker exec -i dbrunning mariadb -u root -psekrit todo_db -e "
+                    CREATE TABLE IF NOT EXISTS todos (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        title VARCHAR(255) NOT NULL,
+                        is_done BOOLEAN NOT NULL DEFAULT FALSE,
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    );"
+                    echo "Database schema initialized successfully!"
                 '''
             }
         }
@@ -48,7 +57,7 @@ pipeline {
                     --network net-demo \
                     -p 8081:8080 \
                     -e ASPNETCORE_ENVIRONMENT=Development \
-                    -e ConnectionStrings__DefaultConnection="Server=dbrunning;Port=3306;Database=TodoDb;Uid=root;Pwd=secret;" \
+                    -e ConnectionStrings__DefaultConnection="Server=dbrunning;Port=3306;Database=todo_db;Uid=todo_usr;Pwd=letmeinplz;" \
                     dotnet-demo-app
                 '''
             }
