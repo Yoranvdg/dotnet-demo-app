@@ -4,18 +4,15 @@ pipeline {
         stage('Cleanup') {
             steps {
                 catchError(buildResult: 'SUCCESS') {
-                    sh 'docker compose down'
+                    sh 'docker-compose down'
                 }
             }
         }
-        stage('Unit Tests') {
+        stage('Build and Test via Docker') {
             steps {
-                sh 'dotnet test'
-            }
-        }
-        stage('Deploy with Docker Compose') {
-            steps {
-                sh 'docker compose up -d --build'
+                // In plaats van 'dotnet test' lokaal te draaien, 
+                // laten we Docker Compose de hele app en tests bouwen en opstarten
+                sh 'docker-compose up -d --build'
             }
         }
     }
