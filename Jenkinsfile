@@ -28,14 +28,10 @@ pipeline {
         }
         stage('Wait for Database') {
             steps {
-                // Vraagt actief aan MariaDB of hij al klaar is door een simpele query uit te voeren
                 sh '''
-                    echo "Waiting for MariaDB to be fully ready..."
-                    until docker exec dbrunning mysql -uroot -psecret -e "SELECT 1;" >/dev/null 2>&1; do
-                        echo "Database is still booting, waiting 3 seconds..."
-                        sleep 3
-                    done
-                    echo "Database is online and ready!"
+                    echo "Waiting for MariaDB to fully initialize..."
+                    sleep 15
+                    echo "Database startup buffer complete!"
                 '''
             }
         }
