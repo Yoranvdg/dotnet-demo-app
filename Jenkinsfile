@@ -34,7 +34,7 @@ pipeline {
                     echo "Waiting 20 seconds for MariaDB to initialize..."
                     sleep 20
                     echo "Creating todos table..."
-                    docker exec -i dbrunning mariadb -utodo_usr -pletmeinplz todo_db -e "
+                    docker exec -i dbrunning mariadb -uroot -psekrit todo_db -e "
                     CREATE TABLE IF NOT EXISTS todos (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         title VARCHAR(255) NOT NULL,
