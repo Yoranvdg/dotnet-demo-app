@@ -16,8 +16,8 @@ pipeline {
         }
         stage('Run Container') {
             steps {
-                // Start de net gebouwde .NET app container op poort 8080
-                sh 'docker run -d --name dotnetrunning -p 8080:8080 dotnet-demo-app'
+                // Map naar poort 8081 zodat deze niet botst met Jenkins op poort 8080
+                sh 'docker run -d --name dotnetrunning -p 8081:8080 dotnet-demo-app'
             }
         }
     }
