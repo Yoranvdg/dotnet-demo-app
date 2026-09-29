@@ -4,14 +4,22 @@ pipeline {
         stage('Cleanup') {
             steps {
                 catchError(buildResult: 'SUCCESS') {
-                    sh 'podman compose down'
+                    sh 'docker stop dotnetrunning || true'
+                    sh 'docker rm dotnetrunning || true'
                 }
             }
         }
-        stage('Deploy with Podman Compose') {
+        stage('Build Docker Image') {
             steps {
-                // Bouwt en start de .NET app en MariaDB via podman compose
-                sh 'podman compose up -d --build'
+                // Bouw de Docker image van de .NET app
+                // (In de TodoApp map zit de Dockerfile of we gebruiken de root)
+                sh 'docker build -t dotnet-demo-app .'
+            }
+        }
+        stage('Run Container') {
+            steps {
+                // Start de container op poort 8080
+                sh 'docker run -d --name dotnetrunning -p 8080:8080 dotnet-demo-app'
             }
         }
     }
