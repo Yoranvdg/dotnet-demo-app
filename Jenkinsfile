@@ -4,20 +4,17 @@ pipeline {
         stage('Cleanup') {
             steps {
                 catchError(buildResult: 'SUCCESS') {
+                    // Stopt eventueel oude losse containers of compose stacks
                     sh 'docker stop dotnetrunning || true'
                     sh 'docker rm dotnetrunning || true'
+                    sh 'docker compose down || true'
                 }
             }
         }
-        stage('Build Docker Image') {
+        stage('Deploy with Docker Compose') {
             steps {
-                sh 'docker build -t dotnet-demo-app ./TodoApp'
-            }
-        }
-        stage('Run Container') {
-            steps {
-                // Map naar poort 8081 zodat deze niet botst met Jenkins op poort 8080
-                sh 'docker run -d --name dotnetrunning -p 8081:8080 dotnet-demo-app'
+                // Start de complete stack (app + database) op basis van de docker-compose.yml
+                sh 'docker compose up -d --build'
             }
         }
     }
