@@ -31,14 +31,18 @@ pipeline {
         stage('Wait for Database & Init Schema') {
             steps {
                 sh '''
-                    echo "Waiting for MariaDB to be fully ready..."
-                    until docker exec dbrunning mariadb-admin ping -h 127.0.0.1 -uroot -psekrit --silent; do
-                        echo "MariaDB is starting up, waiting..."
+                    echo "Waiting for MariaDB to accept connections..."
+                    for i in {1..30}; do
+                        if docker exec dbrunning mariadb -uroot -psekrit -e "SELECT 1;" >/dev/null 2>&1; then
+                            echo "MariaDB is up and running!"
+                            break
+                        fi
+                        echo "Attempt $i: MariaDB is starting up, waiting 3 seconds..."
                         sleep 3
                     done
                     
-                    echo "MariaDB is up! Creating todos table..."
-                    docker exec -i dbrunning mariadb -h 127.0.0.1 -utodo_usr -pletmeinplz todo_db << 'EOF'
+                    echo "Creating todos table..."
+                    docker exec -i dbrunning mariadb -utodo_usr -pletmeinplz todo_db << 'EOF'
                     CREATE TABLE IF NOT EXISTS todos (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         title VARCHAR(255) NOT NULL,
