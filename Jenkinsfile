@@ -43,15 +43,8 @@ pipeline {
                         sleep 3
                     done
                     
-                    echo "MariaDB is up! Creating todos table via TCP..."
-                    docker exec -i dbrunning mariadb -h 127.0.0.1 -utodo_usr -pletmeinplz todo_db << 'EOF'
-                    CREATE TABLE IF NOT EXISTS todos (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        title VARCHAR(255) NOT NULL,
-                        is_done BOOLEAN NOT NULL DEFAULT FALSE,
-                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-                    );
-                    EOF
+                    echo "MariaDB is up! Creating todos table..."
+                    docker exec dbrunning mariadb -h 127.0.0.1 -utodo_usr -pletmeinplz todo_db -e "CREATE TABLE IF NOT EXISTS todos (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, is_done BOOLEAN NOT NULL DEFAULT FALSE, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);"
                     echo "Database schema initialized successfully!"
                 '''
             }
