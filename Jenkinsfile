@@ -32,17 +32,19 @@ pipeline {
             steps {
                 sh '''
                     echo "Waiting for MariaDB to accept connections..."
-                    for i in {1..30}; do
-                        if docker exec dbrunning mariadb -uroot -psekrit -e "SELECT 1;" >/dev/null 2>&1; then
-                            echo "MariaDB is up and running!"
-                            break
+                    counter=0
+                    while ! docker exec dbrunning mariadb -h 127.0.0.1 -uroot -psekrit -e "SELECT 1;" >/dev/null 2>&1; do
+                        counter=$((counter+1))
+                        if [ $counter -gt 30 ]; then
+                            echo "Timeout waiting for MariaDB!"
+                            exit 1
                         fi
-                        echo "Attempt $i: MariaDB is starting up, waiting 3 seconds..."
+                        echo "Attempt $counter: MariaDB is starting up, waiting 3 seconds..."
                         sleep 3
                     done
                     
-                    echo "Creating todos table..."
-                    docker exec -i dbrunning mariadb -utodo_usr -pletmeinplz todo_db << 'EOF'
+                    echo "MariaDB is up! Creating todos table via TCP..."
+                    docker exec -i dbrunning mariadb -h 127.0.0.1 -utodo_usr -pletmeinplz todo_db << 'EOF'
                     CREATE TABLE IF NOT EXISTS todos (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         title VARCHAR(255) NOT NULL,
